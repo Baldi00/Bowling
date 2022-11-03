@@ -4,19 +4,13 @@ using UnityEngine;
 
 public class Ball : MonoBehaviour
 {
-    public float force;
-    private Rigidbody rb;
+    public GameManager gameManager;
 
-    private void Awake()
+    private void OnCollisionEnter(Collision collision)
     {
-        rb = GetComponent<Rigidbody>();
-    }
-
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Mouse0))
+        if(collision.gameObject.name == "BottomFloor")
         {
-            rb.AddForce(Vector3.forward * force);
+            gameManager.RemoveFallenPinsAndResetBall();
         }
     }
 }

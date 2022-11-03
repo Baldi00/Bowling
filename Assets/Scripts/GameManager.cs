@@ -8,6 +8,8 @@ public class GameManager : MonoBehaviour
 
     public GameObject arrow;
     public GameObject ball;
+    public GameObject ballPrefab;
+    public GameObject pinsPrefab;
 
     public float phase1Speed;
     public float phase2Speed;
@@ -17,6 +19,7 @@ public class GameManager : MonoBehaviour
     private int ballDirection;
     private int arrowAngleDirection;
     private int arrowForceDirection;
+    private int fallenPins;
 
     private Rigidbody ballRigidBody;
 
@@ -27,6 +30,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        fallenPins = 0;
         phase = 0;
         ballDirection = -1;
         arrowAngleDirection = -1;
@@ -96,5 +100,51 @@ public class GameManager : MonoBehaviour
         float force = 3000 * arrow.transform.localScale.x * 2f;
         Vector3 direction = Quaternion.Euler(0, angle, 0) * Vector3.left;
         ballRigidBody.AddForce(direction * force);
+    }
+
+    public void RemoveFallenPinsAndResetBall()
+    {
+        Destroy(ball);
+        StartCoroutine(WaitThenDestroyFallenPins());
+    }
+
+    IEnumerator WaitThenDestroyFallenPins()
+    {
+        yield return new WaitForSeconds(1.5f);
+        GameObject[] pins = GameObject.FindGameObjectsWithTag("Pin");
+        foreach (GameObject pin in pins)
+        {
+            if (pin.transform.eulerAngles.x < -1 || pin.transform.eulerAngles.x > 1
+                || pin.transform.eulerAngles.z < -1 || pin.transform.eulerAngles.z > 1)
+            {
+                Destroy(pin);
+                fallenPins++;
+            }
+        }
+
+        StartCoroutine(WaitThenResetBall());
+    }
+
+    IEnumerator WaitThenResetBall()
+    {
+        yield return new WaitForSeconds(1);
+        ball = Instantiate(ballPrefab);
+        ball.GetComponent<Ball>().gameManager = GetComponent<GameManager>();
+        ballRigidBody = ball.GetComponent<Rigidbody>();
+        arrow = ball.transform.GetChild(0).gameObject;
+
+        if (fallenPins == 10)
+        {
+            Instantiate(pinsPrefab);
+            fallenPins = 0;
+        }
+
+        phase = 0;
+        ballDirection = -1;
+        arrowAngleDirection = -1;
+        arrowForceDirection = -1;
+        arrow.SetActive(false);
+        ballRigidBody.isKinematic = true;
+        ballRigidBody.detectCollisions = false;
     }
 }
