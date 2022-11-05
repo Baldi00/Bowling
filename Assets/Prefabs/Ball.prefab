@@ -127,6 +127,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManager: {fileID: 0}
+  Launched: 0
+  IsBallArrested: 0
+  ballArrestedFramesThreshold: 180
 --- !u!1 &5139058947783061991
 GameObject:
   m_ObjectHideFlags: 0

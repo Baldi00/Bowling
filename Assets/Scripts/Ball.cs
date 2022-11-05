@@ -5,7 +5,32 @@ using UnityEngine;
 public class Ball : MonoBehaviour
 {
     public GameManager gameManager;
-    private bool playStrike = true;
+    private bool playStrikeSound = true;
+
+    public bool Launched = false;
+    public bool IsBallArrested = false;
+    public int ballArrestedFramesThreshold;
+    private int ballArrestedFramesCount = 0;
+
+    private Rigidbody rb;
+
+    private void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+    }
+
+    private void Update()
+    {
+        if (Launched && rb.velocity.magnitude < 1f)
+        {
+            ballArrestedFramesCount++;
+        }
+
+        if(ballArrestedFramesCount >= ballArrestedFramesThreshold)
+        {
+            gameManager.RemoveFallenPinsAndResetBall();
+        }
+    }
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -13,12 +38,13 @@ public class Ball : MonoBehaviour
         {
             gameManager.RemoveFallenPinsAndResetBall();
         }
+
         if (collision.gameObject.CompareTag("Pin"))
         {
-            if (playStrike)
+            if (playStrikeSound)
             {
                 SoundManager.Instance.PlayStrike();
-                playStrike = false;
+                playStrikeSound = false;
             }
         }
     }

@@ -78,8 +78,6 @@ public class GameManager : MonoBehaviour
             if (phase == 0)
             {
                 phase = 1;
-                ballRigidBody.isKinematic = false;
-                ballRigidBody.detectCollisions = true;
                 arrow.SetActive(true);
             }
             else if (phase == 1)
@@ -90,6 +88,8 @@ public class GameManager : MonoBehaviour
             {
                 phase = 3;
                 arrow.SetActive(false);
+                ballRigidBody.isKinematic = false;
+                ballRigidBody.detectCollisions = true;
                 LaunchBall();
             }
         }
@@ -106,6 +106,7 @@ public class GameManager : MonoBehaviour
         float force = 3000 * arrow.transform.localScale.x * 2f;
         Vector3 direction = Quaternion.Euler(0, angle, 0) * Vector3.left;
         ballRigidBody.AddForce(direction * force);
+        ball.GetComponent<Ball>().Launched = true;
     }
 
     public void RemoveFallenPinsAndResetBall()
